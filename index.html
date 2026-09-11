@@ -2,75 +2,174 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Custom Music Player</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Player ₍˄·͈༝·͈˄₎◞☆</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
-      font-family: Arial, sans-serif;
-      background-color: #121212;
-      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0d0d0d;
+      color: #ffb6c1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      min-height: 100vh;
       margin: 0;
+      padding: 20px;
     }
     .player-card {
-      background-color: #1e1e1e;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      background-color: #161616;
+      padding: 25px;
+      border-radius: 20px;
+      border: 1px solid #ffb6c1;
+      box-shadow: 0 8px 30px rgba(255, 182, 193, 0.15);
       text-align: center;
-      width: 320px;
+      width: 100%;
+      max-width: 380px;
     }
-    input {
-      width: 90%;
-      padding: 10px;
+    h2 {
+      margin-top: 0;
+      font-size: 20px;
+      color: #ffb6c1;
+      letter-spacing: 1px;
+    }
+    .now-playing {
+      font-size: 13px;
+      color: #cccccc;
       margin-bottom: 15px;
-      border-radius: 6px;
-      border: 1px solid #333;
-      background: #2a2a2a;
-      color: white;
-    }
-    button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 6px;
-      background-color: #1db954;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #1ed760;
+      min-height: 36px;
+      word-break: break-word;
+      padding: 8px;
+      background: #222;
+      border-radius: 8px;
     }
     audio {
-      margin-top: 20px;
       width: 100%;
+      margin-bottom: 15px;
+      outline: none;
+    }
+    .playlist {
+      max-height: 320px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 5px;
+    }
+    /* Custom Scrollbar */
+    .playlist::-webkit-scrollbar {
+      width: 6px;
+    }
+    .playlist::-webkit-scrollbar-track {
+      background: #1a1a1a;
+      border-radius: 4px;
+    }
+    .playlist::-webkit-scrollbar-thumb {
+      background: #ffb6c1;
+      border-radius: 4px;
+    }
+    .song-btn {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #333;
+      border-radius: 10px;
+      background-color: #222222;
+      color: #eeeeee;
+      cursor: pointer;
+      font-size: 13px;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: all 0.2s ease;
+    }
+    .song-btn:hover {
+      background-color: #ffb6c1;
+      color: #121212;
+      border-color: #ffb6c1;
     }
   </style>
 </head>
 <body>
 
   <div class="player-card">
-    <h2>Web Player</h2>
-    <input type="text" id="audioUrl" placeholder="Paste Direct Audio MP3 URL...">
-    <button onclick="playAudio()">Play</button>
+    <h2>Playlist ☆ ₍˄·͈༝·͈˄₎◞</h2>
+    <div class="now-playing" id="trackTitle">Select a track to play</div>
 
-    <audio id="audioStream" controls>
-      Your browser does not support the audio tag.
+    <audio id="audioStream" controls autoplay>
+      Your browser does not support the audio element.
     </audio>
+
+    <div class="playlist" id="playlistContainer"></div>
   </div>
 
   <script>
-    function playAudio() {
-      const url = document.getElementById('audioUrl').value;
-      const player = document.getElementById('audioStream');
-      if (url) {
-        player.src = url;
+    // List of your exact uploaded MP3 file names
+    const tracks = [
+      "Almond Chocolate.mp3",
+      "BOOMPALA - LE SSERAFIM.mp3",
+      "Enhypen - Drunk Dazed (Use Headphones).mp3",
+      "Hearts2Hearts 하츠투하츠 'Moonride'.mp3",
+      "ILLIT (아일릿) - 빌려온 고양이 (Do the Dance).mp3",
+      "ILLIT - What is Love？ (cover).mp3",
+      "ILLIT／／Bamsopoong (speed up).mp3",
+      "It's Me - ILLIT.mp3",
+      "LE SSERAFIM (르세라핌) 'ANTIFRAGILE'.mp3",
+      "LEMONADE - Aespa.mp3",
+      "LESSERAFIM(르세라핌) - Spaghetti.mp3",
+      "LOONA／Chuu (츄)- Heart Attack.mp3",
+      "Lemon Tang - Hearts2Hearts (full EP).mp3",
+      "Lucky Girl Syndrome - ILLIT.mp3",
+      "MAMIHLAPINATAPAI - ILLIT (full EP).mp3",
+      "MEOVV(미야오) -BURNING UP.mp3",
+      "NOT ME-ILLIT (slowed).mp3",
+      "PINKY UP (MV Ver.).mp3",
+      "Red Velvet (레드벨벳) Dumb Dumb.mp3",
+      "Red Velvet (레드벨벳) 러시안 룰렛(Russian Roulette).mp3",
+      "Red Velvet - Day 1.mp3",
+      "SUPERNOVA - AESPA.mp3",
+      "The Chase Hearts2Hearts (full ver).mp3",
+      "Toki Yo Tomare - ILLIT (FULL EP).mp3",
+      "WHIPLASH - AESPA.mp3",
+      "[이달의 소녀] Colors- LOONA.mp3",
+      "aespa 에스파 'Armageddon'.mp3",
+      "aespa 에스파 'Drama'.mp3",
+      "are you alive - triples (sped up ／ nightcore).mp3",
+      "iconic heart - hearts2hearts (sped up + reverb).mp3",
+      "illit - bubee sped up and reverbᝰ.ᐟ.mp3",
+      "le sserafim illit katseye - iconic by mistake.mp3",
+      "meovv hit em.mp3",
+      "아일릿 illit ୨ৎ topping (sped up).mp3",
+      "이달의 소녀 (LOONA) - Flip That.mp3",
+      "𝐢𝐥𝐢𝐭-𝐥𝐢𝐭𝐭𝐥𝐞 𝐦𝐨𝐧𝐬𝐭𝐞𝐫.mp3"
+    ];
+
+    const container = document.getElementById('playlistContainer');
+    const player = document.getElementById('audioStream');
+    const trackTitle = document.getElementById('trackTitle');
+
+    // Automatically generate buttons for all tracks
+    tracks.forEach((filename) => {
+      const btn = document.createElement('button');
+      btn.className = 'song-btn';
+      
+      // Clean up display name (remove .mp3)
+      const cleanName = filename.replace('.mp3', '');
+      btn.innerText = `♪ ${cleanName}`;
+
+      btn.onclick = () => {
+        // Encode special characters in file names so the browser can read them
+        const encodedFile = encodeURIComponent(filename);
+        player.src = encodedFile;
         player.play();
-      }
-    }
+        trackTitle.innerText = `Playing: ${cleanName}`;
+      };
+
+      container.appendChild(btn);
+    });
   </script>
 
 </body>
